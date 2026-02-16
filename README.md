@@ -1,3 +1,124 @@
+<pre align="center">
+
+   ░███   ░██████                             ░██ 
+  ░██░██    ░██                               ░██ 
+ ░██  ░██   ░██  ░███████  ░███████  ░██████  ░██ 
+░█████████  ░██ ░██       ░██    ░██      ░██ ░██ 
+░██    ░██  ░██  ░███████ ░██    ░██ ░███████ ░██ 
+░██    ░██  ░██        ░██░██    ░██░██   ░██ ░██ 
+░██    ░██░██████░███████  ░███████  ░█████░██░██ 
+
+</pre>
+# AI Layer
+
+> **Status:** Komponen Inti (Wajib Jalan Pertama)  
+> **Peran:** AI Gateway & Inference Engine
+
+Modul ini adalah **AI Layer** berbasis Python (FastAPI) yang berfungsi sebagai jembatan _stateless_ antara Backend (Node.js) dan model-model LLM Frontier (Claude, Gemini, GPT, Grok, Sonar). Modul ini menangani:
+
+1.  **Otentikasi**: Mengelola sesi ke provider AI via `cookies.json`.
+2.  **Estimasi Token**: Menghitung _cost_ token secara real-time menggunakan `tiktoken`.
+3.  **Ekstraksi Konteks**: Membaca dan memproses teks dari file PDF yang diunggah.
+4.  **Standarisasi Inferensi**: Menyediakan satu endpoint seragam (`/generate`) untuk berbagai model.
+
+---
+
+## 🚀 Persiapan & Instalasi
+
+Service ini harus dijalankan **sebelum** backend Node.js, karena backend akan memanggil API ini.
+
+### 1. Buat File `cookies.json` (Wajib)
+
+Sistem ini membutuhkan kredensial sesi yang valid untuk mengakses API model. Buatlah file bernama `cookies.json` di root folder ini.
+
+**Format Isi File:**
+
+```json
+{
+  "next-auth.csrf-token": "ISI_TOKEN_CSRF_DARI_BROWSER",
+  "next-auth.session-token": "ISI_TOKEN_SESSION_DARI_BROWSER",
+  "__Secure-next-auth.session-token": "ISI_JIKA_ADA_(OPSIONAL)"
+}
+```
+
+**Cara Mendapatkan Cookies:**
+
+1. Buka website provider AI (misal Perplexity) di browser (Chrome/Edge).
+2. Tekan `F12` untuk membuka Developer Tools, lalu pilih tab **Network**.
+3. Lakukan refresh halaman atau kirim satu chat tes.
+4. Klik kanan pada request api (biasanya bernama `ask` atau `graphql`).
+5. Pilih **Copy** > **Copy as cURL**.
+6. Gunakan tool konversi (atau cari manual di string header `Cookie:`) untuk mengambil nilai `next-auth.csrf-token` dan `next-auth.session-token`.
+
+> ⚠️ **Penting:** File `cookies.json` bersifat rahasia. Jangan pernah mengunggahnya ke repository publik (git).
+
+### 2. Instalasi Dependensi
+
+Pastikan Python 3.10+ sudah terinstall.
+
+```bash
+# Buat virtual environment (opsional tapi disarankan)
+python -m venv .venv
+
+# Aktifkan virtual environment
+# Windows:
+.venv\Scripts\activate
+# Mac/Linux:
+source .venv/bin/activate
+
+# Install library yang dibutuhkan
+pip install fastapi uvicorn pydantic pypdf tiktoken requests
+```
+
+### 3. Menjalankan AI Layer
+
+Jalankan perintah berikut untuk menghidupkan server:
+
+```bash
+python aisoal.py
+```
+
+_Jika local, Server akan berjalan di `http://localhost:8000`._
+
+---
+
+## 📡 API Contract (Internal Use)
+
+Backend Node.js akan berkomunikasi dengan AI Layer melalui endpoint ini.
+
+**Endpoint:** `POST /generate`
+
+**Payload Request:**
+
+```json
+{
+  "query": "_template_", // Pertanyaan atau instruksi yang ingin dijawab oleh model
+  "model": "_model_name_", // e.g. "gpt-5.2", "claude-4.5-sonnet", etc.
+  "filepath": "_path_to_pdf_file_" // Path ke file PDF yang diunggah untuk konteks
+}
+```
+
+**Format Response:**
+
+```json
+{
+  "status": "success", // atau "error" jika terjadi kesalahan
+  "answer": "_jawaban_dari_model_", // Jawaban yang dihasilkan oleh model
+  "usage_estimate": {
+    "input_tokens": "_jumlah_token_input_", // Estimasi jumlah token yang digunakan untuk input (query + konteks)
+    "output_tokens": "_jumlah_token_output_", // Estimasi jumlah token yang akan dihasilkan oleh model sebagai output
+    "total_tokens": "_total_token_", // Total token (input + output)
+    "duration": "_durasi_response_model_" // Waktu yang dibutuhkan model untuk merespon (dalam detik)
+  }
+}
+```
+
+---
+
+# ORIGINAL README.md CONTENT STARTS HERE
+
+---
+
 # Perplexity AI
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
@@ -112,7 +233,7 @@ asyncio.run(main())
 
 ### Web Interface
 
-The web interface automates account creation and usage in a browser. [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-python#best-practices) uses ["Chrome User Data Directory"](https://www.google.com/search?q=chrome+user+data+directory) to be completely undetected, it's ``C:\Users\YourName\AppData\Local\Google\Chrome\User Data`` for Windows, as shown below:
+The web interface automates account creation and usage in a browser. [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-python#best-practices) uses ["Chrome User Data Directory"](https://www.google.com/search?q=chrome+user+data+directory) to be completely undetected, it's `C:\Users\YourName\AppData\Local\Google\Chrome\User Data` for Windows, as shown below:
 
 ```python
 import os
@@ -167,7 +288,7 @@ And this is how you use your own account, you need to get your cookies in order 
 ```python3
 import perplexity
 
-perplexity_cookies = { 
+perplexity_cookies = {
     <your cookies here>
 }
 
@@ -182,7 +303,7 @@ And finally account generating, you need to get cookies for [Emailnator](https:/
 ```python3
 import perplexity
 
-emailnator_cookies = { 
+emailnator_cookies = {
     <your cookies here>
 }
 
@@ -233,7 +354,7 @@ And this is how you use your own account, you need to get your cookies in order 
 import asyncio
 import perplexity_async
 
-perplexity_cookies = { 
+perplexity_cookies = {
     <your cookies here>
 }
 
@@ -252,7 +373,7 @@ And finally account generating, you need to get cookies for [emailnator](https:/
 import asyncio
 import perplexity_async
 
-emailnator_cookies = { 
+emailnator_cookies = {
     <your cookies here>
 }
 
@@ -269,21 +390,23 @@ asyncio.run(test())
 ## How to Get Cookies
 
 ### Perplexity (to use your own account)
-* Open [Perplexity.ai](https://perplexity.ai/) website and login to your account.
-* Click F12 or ``Ctrl + Shift + I`` to open inspector.
-* Go to the "Network" tab in the inspector.
-* Refresh the page, right click the first request, hover on "Copy" and click to "Copy as cURL (bash)".
-* Now go to the [CurlConverter](https://curlconverter.com/python/) and paste your code here. The cookies dictionary will appear, copy and use it in your codes.
+
+- Open [Perplexity.ai](https://perplexity.ai/) website and login to your account.
+- Click F12 or `Ctrl + Shift + I` to open inspector.
+- Go to the "Network" tab in the inspector.
+- Refresh the page, right click the first request, hover on "Copy" and click to "Copy as cURL (bash)".
+- Now go to the [CurlConverter](https://curlconverter.com/python/) and paste your code here. The cookies dictionary will appear, copy and use it in your codes.
 
 <img src="images/perplexity.png">
 
 ### Emailnator (for account generating)
-* Open [Emailnator](https://emailnator.com/) website and verify you're human.
-* Click F12 or ``Ctrl + Shift + I`` to open inspector.
-* Go to the "Network" tab in the inspector.
-* Refresh the page, right click the first request, hover on "Copy" and click to "Copy as cURL (bash)".
-* Now go to the [CurlConverter](https://curlconverter.com/python/) and paste your code here. The cookies dictionary will appear, copy and use it in your codes.
-* Cookies for [Emailnator](https://emailnator.com/) are temporary, you need to renew them continuously.
+
+- Open [Emailnator](https://emailnator.com/) website and verify you're human.
+- Click F12 or `Ctrl + Shift + I` to open inspector.
+- Go to the "Network" tab in the inspector.
+- Refresh the page, right click the first request, hover on "Copy" and click to "Copy as cURL (bash)".
+- Now go to the [CurlConverter](https://curlconverter.com/python/) and paste your code here. The cookies dictionary will appear, copy and use it in your codes.
+- Cookies for [Emailnator](https://emailnator.com/) are temporary, you need to renew them continuously.
 
 <img src="images/emailnator.png">
 
@@ -296,11 +419,11 @@ class Client:
     def __init__(self, cookies: Optional[Dict[str, str]] = None):
         """
         Initialize Perplexity client.
-        
+
         Args:
             cookies: Optional Perplexity account cookies for enhanced features
         """
-    
+
     def search(
         self,
         query: str,
@@ -315,7 +438,7 @@ class Client:
     ) -> Union[Dict, Generator]:
         """
         Search with Perplexity AI.
-        
+
         Args:
             query: Search query
             mode: Search mode ('auto', 'pro', 'reasoning', 'deep research')
@@ -326,15 +449,15 @@ class Client:
             language: ISO 639 language code
             follow_up: Previous query for context
             incognito: Enable incognito mode
-            
+
         Returns:
             Response dict with 'answer' key, or generator if stream=True
         """
-    
+
     def create_account(self, emailnator_cookies: Dict[str, str]):
         """
         Create new account using Emailnator.
-        
+
         Args:
             emailnator_cookies: Emailnator cookies for account creation
         """
@@ -427,15 +550,19 @@ flake8 perplexity perplexity_async
 ### Common Issues
 
 **Issue**: Response returns `None`
+
 - **Solution**: The API structure may have changed. Check [Changelog](docs/CHANGELOG.md) for updates.
 
 **Issue**: Account creation fails
+
 - **Solution**: Emailnator cookies expire frequently. Get fresh cookies from [Emailnator.com](https://emailnator.com/).
 
 **Issue**: File upload fails
+
 - **Solution**: Ensure you have a valid Perplexity account with file upload quota available.
 
 **Issue**: Rate limiting
+
 - **Solution**: Use built-in rate limiting or wait between requests. Consider using async API for better concurrency.
 
 ### Getting Help
