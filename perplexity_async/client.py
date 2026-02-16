@@ -135,9 +135,9 @@ class Client(AsyncMixin):
                     "claude-4.5-sonnet",
                     "grok-4.1",
                 ],
-                "reasoning": [None, "gpt-5.2-thinking", "claude-4.5-sonnet-thinking", "gemini-3.0-pro", "kimi-k2-thinking", "grok-4.1-reasoning"],
+                "reasoning": [None, "gpt-5.2-thinking", "claude-4.5-sonnet-thinking", "gemini-3.0-pro", "gemini-3.0-flash", "kimi-k2-thinking", "grok-4.1-reasoning"],
                 "deep research": [None],
-                "copilot": [None, "gemini-3.0-pro", "kimi-k2-thinking"],
+                "copilot": [None, "gemini-3.0-pro", "gemini-3.0-flash", "kimi-k2-thinking"],
             }[mode]
             if self.own
             else True
@@ -228,6 +228,7 @@ class Client(AsyncMixin):
                         "gpt-5.2-thinking": "gpt52_thinking",
                         "claude-4.5-sonnet-thinking": "claude45sonnetthinking",
                         "gemini-3.0-pro": "gemini30pro",
+                        "gemini-3.0-flash": "gemini30flash",
                         "kimi-k2-thinking": "kimik2thinking",
                         "grok-4.1-reasoning": "grok41reasoning",
                     },
