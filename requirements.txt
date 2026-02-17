@@ -1,1 +1,8 @@
 curl_cffi
+fastapi
+uvicorn
+pydantic
+pypdf
+tiktoken
+requests
+websocket-client
