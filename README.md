@@ -10,8 +10,7 @@
 </pre>
 # AI Layer
 
-> **Status:** Komponen Inti (Wajib Jalan Pertama)  
-> **Peran:** AI Gateway & Inference Engine
+> _Sudah berhasil buat database? Jika belum [📄 Lihat Panduan](https://github.com/aisoal/database) terlebih dahulu._
 
 Modul ini adalah **AI Layer** berbasis Python (FastAPI) yang berfungsi sebagai jembatan _stateless_ antara Backend (Node.js) dan model-model LLM Frontier (Claude, Gemini, GPT, Grok, Sonar). Modul ini menangani:
 
@@ -111,6 +110,10 @@ Backend Node.js akan berkomunikasi dengan AI Layer melalui endpoint ini.
   }
 }
 ```
+
+## ⚙️ Konfigurasi Backend
+
+Lanjut [📄 Lihat Panduan](https://github.com/aisoal/backend)
 
 ---
 
